@@ -1,0 +1,7 @@
+openai==1.14.1
+python-dotenv
+javalang==0.13.0
+lxml
+pyyaml
+flask
+httpx

@@ -1,0 +1,8 @@
+Task:
+   Type: Coding
+   Language: GoLang
+   Target Technology Stack: 
+    - GoLang
+    - MongoDB GoLang Driver
+   Description: Generate a MongoDB implementation of the provided repository-interface to CRUD data in MongoDB using the MongoDB GoLang driver api instead of mysql. 
+
