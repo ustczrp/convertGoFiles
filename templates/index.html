@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Add some basic CSS styles -->
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f0f0f0;
+      }
+
+      .container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        width: 80%;
+        max-width: 800px;
+        height: 100%;
+        max-height: 800px;
+        overflow-y: auto;
+      }
+
+      .logo {
+        width: 200px;
+        margin-bottom: 20px;
+      }
+
+      label,
+      input[type="text"] {
+        display: inline-block;
+        margin: 10px 5px;
+      }
+
+      input[type="submit"] {
+        background-color: #589636;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        display: block;
+        margin: 20px auto;
+      }
+
+      input[type="submit"]:hover {
+        background-color: #457525;
+      }
+
+      /* Add styles for the progress bar */
+      #progress-bar {
+        width: 80%;
+        height: 20px;
+        margin: 20px auto;
+        display: none; /* Initially hidden */
+      }
+
+      #file-list {
+        list-style-type: none;
+        padding: 0;
+        margin: 20px auto;
+        width: 80%;
+        text-align: left;
+        color: gray;
+        font-size: 0.9em;
+      }
+      #file-list li {
+        padding: 1px 0;
+        border-bottom: 0.1px solid #ffffff;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <img
+        class="logo"
+        src="/static/pics/mongodb-logo.svg"
+        alt="MongoDB Logo"
+      />
+
+      <h2>Code Refactor for GoLang</h2>
+
+      <form action="/" method="post">
+        <label for="path">Your legacy code path:</label>
+        <input type="text" id="path" name="path" style="width: 50%" /><br />
+        <textarea
+          id="prompt"
+          name="prompt"
+          rows="10"
+          cols="80"
+          style="color: gray"
+        >
+Role:
+You are a GoLang developer master and very proficient in replacing MySQL with MongoDB.
+
+Task:
+  Type: Coding
+  Language: GoLang
+  Target Technology Stack: 
+    - GoLang
+    - MongoDB GoLang Driver
+  Description: Generate a MongoDB implementation of the provided repository-interface to persist data in MongoDB using the MongoDB GoLang driver API.
+        </textarea
+        ><br />
+        <input type="submit" value="Start" />
+      </form>
+
+      <!-- Add a progress bar -->
+      <progress id="progress-bar" max="100" value="0"></progress>
+
+      <!-- Add a list for the files -->
+      <ul id="file-list"></ul>
+    </div>
+
+    <script>
+      // When the form is submitted, disable all inputs and the submit button
+      document
+        .querySelector("form")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+
+          // Check if the path input is empty
+          const pathInput = document.getElementById("path");
+          if (!pathInput.value.trim()) {
+            alert("Path cannot be empty.");
+            return;
+          }
+          // Manually submit the form
+          this.submit();
+
+          // Disable all inputs and the submit button
+          const inputs = document.querySelectorAll("input, textarea");
+          inputs.forEach((input) => {
+            input.disabled = true;
+          });
+
+          // Show the progress bar
+          updateProgressBar();
+          updateFileList();
+        });
+
+      function updateProgressBar() {
+        fetch("/progress")
+          .then((response) => response.json())
+          .then((data) => {
+            const progressBar = document.getElementById("progress-bar");
+            progressBar.value = data.progress * 100; // Assuming data.progress is a value between 0 and 1
+            progressBar.style.display = "block";
+
+            // If the progress is not 100%, keep updating
+            if (data.progress < 1) {
+              const submitButton = document.querySelector(
+                'input[type="submit"]'
+              );
+              const runningStates = ["Running.", "Running..", "Running..."];
+              const randomIndex = Math.floor(
+                Math.random() * runningStates.length
+              );
+              submitButton.value = runningStates[randomIndex];
+              setTimeout(updateProgressBar, 1000);
+            } else {
+              // Optionally hide the progress bar when complete
+              //progressBar.style.display = "none";
+              const completeMessage = document.createElement("div");
+              completeMessage.textContent =
+                "All code refactoring operations have been completed.";
+              completeMessage.style.color = "green";
+              completeMessage.style.textAlign = "center";
+              progressBar.parentNode.insertBefore(
+                completeMessage,
+                progressBar.nextSibling
+              );
+              const submitButton = document.querySelector(
+                'input[type="submit"]'
+              );
+              submitButton.value = "Start";
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching progress:", error);
+          });
+      }
+
+      // Add a function to update the file list
+      function updateFileList() {
+        fetch("/file_list")
+          .then((response) => response.json())
+          .then((data) => {
+            // Clear the existing file list
+            const fileList = document.getElementById("file-list");
+            fileList.innerHTML = "";
+
+            // Add each file to the list
+            data.file_list.forEach((file) => {
+              const li = document.createElement("li");
+              li.textContent = `${file.name}: ${file.status}`;
+              fileList.appendChild(li);
+            });
+
+            // If the progress is not 100%, keep updating
+            //if (data.progress < 1) {
+            setTimeout(updateFileList, 1000);
+            //}
+          })
+          .catch((error) => {
+            console.error("Error fetching file list:", error);
+          });
+      }
+    </script>
+  </body>
+</html>
